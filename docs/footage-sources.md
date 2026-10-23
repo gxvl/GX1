@@ -4,14 +4,14 @@ These stand in for GX1 footage in a fictional showcase. None of it is real GX1 o
 
 ## Video (Pexels License)
 
-4K masters, re-encoded with ffmpeg into web versions (H.264, no audio, faststart): 1440p for desktop and 720p for phones.
+4K masters, re-encoded with ffmpeg into web versions (H.264, no audio, faststart): a desktop size and a phone size per clip.
 
 | File | Source | Master |
 |---|---|---|
 | `public/video/street-1440.mp4`, `street-720.mp4` | [Pexels video 2836342](https://www.pexels.com/video/backside-of-people-walking-on-a-street-sidewalk-2836342/), first 12 s | 3840×2160, 23.976 fps |
-| `public/video/stairs-1440.mp4`, `stairs-720.mp4` | [Pexels video 7876927](https://www.pexels.com/video/person-walking-up-the-stairs-7876927/) | 4096×2160, 25 fps |
+| `public/video/pov-1080.mp4`, `pov-540.mp4` | [Pexels video 15211027](https://www.pexels.com/video/point-of-view-of-a-person-walking-along-a-forest-path-15211027/), 10 s from 0:02, light denoise (foliage is costly to encode) | 3840×2160, 23.976 fps |
 | `src/assets/posters/street.jpg` | first frame of 2836342 (4K) | |
-| `src/assets/posters/stairs.jpg` | first frame of 7876927 (4K) | |
+| `src/assets/posters/pov.jpg` | frame at 0:02 of 15211027 (4K) | |
 
 ## Stills (Unsplash License)
 

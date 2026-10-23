@@ -123,7 +123,7 @@ The system is sparse and functional. It has one off-white for the HUD, one red t
 
 **Key Characteristics:**
 - Full-bleed photographic takes (`min-height: 100svh`), each with a clip slate and timecode.
-- **Moving footage** (`FootageVideo`): where a take's point is motion (the hero and the stabilizer), a muted loop plays over a `next/image` poster. The poster is the content and the LCP. The file is chosen on mount (720p under 768px, 1440p otherwise, both encoded from 4K masters), it plays only while on screen, and it never loads under reduced motion. Every looping video has a `VideoToggle` pause control (WCAG 2.2.2) outside any transformed frame. Bright footage behind the hero headline gets the stronger `hero` scrim.
+- **Moving footage** (`FootageVideo`): where a take's point is motion (the hero and the stabilizer), a muted loop plays over a `next/image` poster. The poster is the content and the LCP. The file is chosen on mount (a phone size under 768px and a desktop size otherwise, both encoded from 4K masters), it plays only while on screen, and it never loads under reduced motion. Every looping video has a `VideoToggle` pause control (WCAG 2.2.2) outside any transformed frame. Bright footage behind the hero headline gets the stronger `hero` scrim.
 - A thin off-white HUD over footage, set in condensed tracked caps.
 - Red for recording and the primary action, and yellow for focus. Each color has one meaning.
 - Legibility comes from local scrims and ink caption chips, never from darkening the whole frame.
@@ -227,7 +227,7 @@ There are three corner sizes, each with its own job. **Small corners** (4px) go 
 - **Kit list:** Rows between hairlines with a radio dot that fills yellow when active, a kit name in title caps, the contents in dim body text, and a mono price.
 
 ### Viewfinder overlays (signature)
-- **Level line:** A full-width 1px HUD line with white end ticks, a yellow centre tick, and a mono "0.0°" readout. The stabilizer demo repeats it at 12% inset, perfectly level while the footage shakes under it.
+- **Level line:** A full-width 1px HUD line with white end ticks, a yellow centre tick, and a mono "0.0°" readout. The stabilizer demo repeats it at 12% inset, perfectly level while the footage moves under it. In that demo the visitor is the hand: pointer position (or phone tilt) aims a spring-modeled camera over first-person footage. With the stabilizer off, the frame follows with overshoot, tremor and roll. With it on, the frame follows the aim smoothly and the roll stays at zero.
 - **Adapted effects:** Aceternity components were rebuilt into the HUD grammar. Compare uses a yellow slider line with a bracket handle and a native range input instead of sparkles and an indigo glow. Lens became a square punch-in frame with focus brackets and a "2× punch-in" chip. Text Generate became live captions on an ink bar. Placeholders and Vanish Input became the HUD email field.
 
 ### Motion

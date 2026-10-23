@@ -12,7 +12,7 @@ import { kits, specs } from "@/lib/catalog";
 import { formatPrice } from "@/lib/region";
 
 import street from "@/assets/posters/street.jpg";
-import stairs from "@/assets/posters/stairs.jpg";
+import pov from "@/assets/posters/pov.jpg";
 import kyoto from "@/assets/footage/kyoto-dusk.jpg";
 import kyotoPhone from "@/assets/footage/kyoto-dusk-phone.jpg";
 import waterfront from "@/assets/footage/waterfront.jpg";
@@ -172,12 +172,11 @@ export default function Home({ searchParams }: PageProps<"/">) {
               }
             >
               <FootageVideo
-                id="stairs-footage"
-                poster={stairs}
-                src="/video/stairs-1440.mp4"
-                srcSmall="/video/stairs-720.mp4"
-                alt="A low tracking shot follows a runner up old stone stairs between plastered walls."
-                className="object-[22%_50%] md:object-center"
+                id="pov-footage"
+                poster={pov}
+                src="/video/pov-1080.mp4"
+                srcSmall="/video/pov-540.mp4"
+                alt="First-person view walking along a sunlit dirt path through a tall beech and pine forest."
               />
             </StabilizerDemo>
           }
@@ -187,16 +186,16 @@ export default function Home({ searchParams }: PageProps<"/">) {
               Your hand shakes. The horizon doesn&apos;t.
             </h2>
             <p className="mt-5 max-w-md w-fit rounded-sm bg-ink/75 px-3 py-2 text-lg leading-relaxed text-hud backdrop-blur-sm">
-              Three motors correct every wobble before it reaches the sensor. Move your pointer across the frame to shake it, then switch the stabilizer off.
+              You&apos;re holding the camera: the frame follows your hand, wobble and all. Switch the stabilizer on and three motors take the shake out while you keep aiming.
             </p>
           </div>
-          <VideoToggle targetId="stairs-footage" className="absolute top-[4.25rem] right-4 sm:right-8" />
+          <VideoToggle targetId="pov-footage" className="absolute top-[4.25rem] right-4 sm:right-8" />
           <Note
             principle="Client only when necessary"
             file="src/components/stabilizer-demo.tsx"
             className="absolute top-28 right-4 sm:right-8"
           >
-            One client island with a single requestAnimationFrame loop that writes to the DOM directly. It stops while it&apos;s off screen and stays still under reduced motion.
+            One client island: pointer or phone tilt drives a spring-modeled hand, and a single requestAnimationFrame loop writes transforms straight to the DOM. It stops off screen and stays still under reduced motion.
           </Note>
         </Take>
 
