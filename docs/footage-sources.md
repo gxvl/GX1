@@ -9,7 +9,7 @@ These stand in for GX1 footage in a fictional showcase. None of it is real GX1 o
 | File | Source | Master |
 |---|---|---|
 | `public/video/street-1440.mp4`, `street-720.mp4` | [Pexels video 2836342](https://www.pexels.com/video/backside-of-people-walking-on-a-street-sidewalk-2836342/), first 12 s | 3840×2160, 23.976 fps |
-| `public/video/pov-1080.mp4`, `pov-540.mp4` | [Pexels video 15211027](https://www.pexels.com/video/point-of-view-of-a-person-walking-along-a-forest-path-15211027/), 10 s from 0:02, light denoise (foliage is costly to encode) | 3840×2160, 23.976 fps |
+| `public/video/pov-1080.mp4` (served to phones too: the gyro mode zooms up to ~2×) | [Pexels video 15211027](https://www.pexels.com/video/point-of-view-of-a-person-walking-along-a-forest-path-15211027/), 10 s from 0:02, light denoise (foliage is costly to encode) | 3840×2160, 23.976 fps |
 | `src/assets/posters/street.jpg` | first frame of 2836342 (4K) | |
 | `src/assets/posters/pov.jpg` | frame at 0:02 of 15211027 (4K) | |
 

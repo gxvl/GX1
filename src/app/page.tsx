@@ -175,7 +175,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
                 id="pov-footage"
                 poster={pov}
                 src="/video/pov-1080.mp4"
-                srcSmall="/video/pov-540.mp4"
+                // Phones crop the 16:9 frame to a narrow slice and the gyro mode
+                // zooms up to ~2x, so they need the full 1080p file here.
+                srcSmall="/video/pov-1080.mp4"
                 alt="First-person view walking along a sunlit dirt path through a tall beech and pine forest."
               />
             </StabilizerDemo>

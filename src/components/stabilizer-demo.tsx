@@ -4,39 +4,54 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { cn } from "@/lib/utils";
 
 const SAMPLES = 120;
-const MAX_ROLL = 8; // degrees, handheld
+const MAX_ROLL = 8; // degrees, handheld (pointer)
+const MAX_PHONE_ROLL = 40; // degrees, gyroscope
 const clamp = (v: number, m: number) => Math.max(-m, Math.min(m, v));
 
 type IOSOrientationEvent = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<"granted" | "denied">;
 };
 
-type Aim = { x: number; y: number; lastInput: number; tilt: boolean };
+type Aim = { x: number; y: number; lastInput: number; tilt: boolean; roll: number };
 
 const isTouch = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(pointer: coarse)").matches &&
   typeof DeviceOrientationEvent !== "undefined";
 
-/** iOS gates motion sensors behind a user gesture; Android does not. */
-const tiltNeedsPermission = () =>
-  isTouch() &&
-  typeof (DeviceOrientationEvent as IOSOrientationEvent).requestPermission === "function";
-
 const noopSubscribe = () => () => {};
 
-/** Maps phone tilt to an aim in [-1, 1]; the first reading is "level". */
+/**
+ * Phone roll in the screen plane (the "steering wheel" angle), in degrees,
+ * positive when the phone turns clockwise. Gravity in device coordinates
+ * follows from the W3C Z-X'-Y'' Euler angles: (sinγ·cosβ, −sinβ, −cosγ·cosβ).
+ * The screen orientation angle is added so landscape reads as level too.
+ */
+function screenRoll(beta: number, gamma: number) {
+  const b = (beta * Math.PI) / 180;
+  const g = (gamma * Math.PI) / 180;
+  const gx = Math.sin(g) * Math.cos(b);
+  const gy = -Math.sin(b);
+  // Lying flat, gravity leaves the screen plane and roll is meaningless.
+  const inPlane = Math.hypot(gx, gy);
+  if (inPlane < 0.3) return 0;
+  const screenAngle =
+    screen.orientation?.angle ?? (window as { orientation?: number }).orientation ?? 0;
+  let roll = (Math.atan2(gx, -gy) * 180) / Math.PI + screenAngle;
+  roll = ((roll + 540) % 360) - 180;
+  // Fade in as the phone comes upright, so tipping it flat doesn't snap.
+  return roll * Math.min(1, (inPlane - 0.3) / 0.3);
+}
+
 function listenTilt(aim: Aim, onFirst: () => void) {
-  let base: number | null = null;
+  let first = true;
   const onTilt = (e: DeviceOrientationEvent) => {
     if (e.gamma == null || e.beta == null) return;
-    if (base === null) {
-      base = e.beta;
+    if (first) {
+      first = false;
       onFirst();
     }
-    aim.x = clamp(e.gamma / 25, 1);
-    aim.y = clamp((e.beta - base) / 20, 1);
-    aim.lastInput = performance.now();
+    aim.roll = screenRoll(e.beta, e.gamma);
     aim.tilt = true;
   };
   window.addEventListener("deviceorientation", onTilt);
@@ -44,13 +59,19 @@ function listenTilt(aim: Aim, onFirst: () => void) {
 }
 
 /**
- * You are the hand holding the camera. Pointer position (or phone tilt) is
- * where the hand aims; the frame follows it.
+ * You are the hand holding the camera. On desktop the pointer is where the
+ * hand aims; the frame follows it.
  *
  * Stabilizer off: a loose, underdamped spring chases the hand, overshoots,
  * rolls with it and carries tremor plus footstep bumps, so the horizon tips.
  * Stabilizer on: a slow critically-damped follow with roll locked at zero:
  * you can still aim, but the horizon stays level.
+ *
+ * On phones the screen is the camera. "Test the stabilizer" asks for motion
+ * access (iOS) or just starts the sensor (Android), then the gyroscope measures how far the
+ * phone is rolled, and with the stabilizer on the footage counter-rotates by
+ * that angle (zooming just enough to hide its corners), so its horizon stays
+ * level with the real one. The HUD level line shows the true horizon.
  *
  * One rAF loop writes transforms straight to the DOM (no re-renders), runs
  * only while on screen, and stays still under reduced motion.
@@ -63,46 +84,60 @@ export function StabilizerDemo({
   overlay?: ReactNode;
 }) {
   const [on, setOn] = useState(false);
-  const needsPermission = useSyncExternalStore(noopSubscribe, tiltNeedsPermission, () => false);
-  const [tiltActive, setTiltActive] = useState(false);
-  const [tiltDenied, setTiltDenied] = useState(false);
+  const touch = useSyncExternalStore(noopSubscribe, isTouch, () => false);
+  const [gyro, setGyro] = useState<"idle" | "starting" | "active" | "unavailable">("idle");
   const onRef = useRef(on);
   const root = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const rawLine = useRef<SVGPolylineElement>(null);
   const outLine = useRef<SVGPolylineElement>(null);
   const readout = useRef<HTMLSpanElement>(null);
-  const aim = useRef<Aim>({ x: 0, y: 0, lastInput: -Infinity, tilt: false });
+  const levelLine = useRef<HTMLDivElement>(null);
+  const aim = useRef<Aim>({ x: 0, y: 0, lastInput: -Infinity, tilt: false, roll: 0 });
   const stopTilt = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     onRef.current = on;
   }, [on]);
 
-  // Phone tilt: Android delivers events without asking; iOS waits for a tap.
-  useEffect(() => {
-    if (!isTouch() || tiltNeedsPermission()) return;
-    return listenTilt(aim.current, () => setTiltActive(true));
-  }, []);
   useEffect(() => () => stopTilt.current?.(), []);
 
-  async function requestTilt() {
+  /** One tap: get motion access, start the gyroscope, switch the stabilizer on. */
+  async function startGyro() {
+    setGyro("starting");
     try {
-      const res = await (DeviceOrientationEvent as IOSOrientationEvent).requestPermission?.();
-      if (res === "granted") {
-        stopTilt.current = listenTilt(aim.current, () => setTiltActive(true));
-      } else {
-        setTiltDenied(true);
+      // iOS gates motion sensors behind a user gesture; Android does not.
+      const request = (DeviceOrientationEvent as IOSOrientationEvent).requestPermission;
+      if (request && (await request()) !== "granted") {
+        setGyro("unavailable");
+        return;
       }
     } catch {
-      setTiltDenied(true);
+      setGyro("unavailable");
+      return;
     }
+    let started = false;
+    stopTilt.current?.();
+    stopTilt.current = listenTilt(aim.current, () => {
+      started = true;
+      setGyro("active");
+      setOn(true);
+    });
+    // Some devices expose the API but never send readings.
+    setTimeout(() => {
+      if (started) return;
+      stopTilt.current?.();
+      stopTilt.current = null;
+      setGyro("unavailable");
+    }, 2000);
   }
 
   useEffect(() => {
     const el = root.current;
     if (!el) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Pointer steering is a desktop thing; phones use the gyroscope instead.
+    const fine = window.matchMedia("(pointer: fine)").matches;
 
     const raw: number[] = Array(SAMPLES).fill(0);
     const out: number[] = Array(SAMPLES).fill(0);
@@ -114,25 +149,28 @@ export function StabilizerDemo({
     let ox = 0, oy = 0, oRoll = 0;
     let offAmount = 1;
     let jolt = 0;
+    let phoneRoll = 0; // smoothed gyroscope roll
+    let box = { w: el.clientWidth, h: el.clientHeight };
+    const ro = new ResizeObserver(() => (box = { w: el.clientWidth, h: el.clientHeight }));
+    ro.observe(el);
     let visible = false;
     let raf = 0;
     let lastSample = 0;
     const t0 = performance.now();
 
     const onMove = (e: PointerEvent) => {
-      if (aim.current.tilt) return;
       const r = el.getBoundingClientRect();
       aim.current.x = clamp(((e.clientX - r.left) / r.width) * 2 - 1, 1);
       aim.current.y = clamp(((e.clientY - r.top) / r.height) * 2 - 1, 1);
       aim.current.lastInput = performance.now();
     };
     const onLeave = () => {
-      if (!aim.current.tilt) aim.current.lastInput = -Infinity;
+      aim.current.lastInput = -Infinity;
     };
 
-    const points = (arr: number[]) =>
+    const points = (arr: number[], range: number) =>
       arr
-        .map((v, i) => `${(i / (SAMPLES - 1)) * 1000},${50 + clamp(v, MAX_ROLL) * 5.5}`)
+        .map((v, i) => `${(i / (SAMPLES - 1)) * 1000},${50 + (clamp(v, range) / range) * 44}`)
         .join(" ");
 
     const loop = (now: number) => {
@@ -140,10 +178,14 @@ export function StabilizerDemo({
       const off = !onRef.current;
       offAmount += ((off ? 1 : 0) - offAmount) * 0.06;
 
-      // Without input, drift gently so the frame is never dead.
+      const tilt = aim.current.tilt;
+      phoneRoll += (clamp(aim.current.roll, MAX_PHONE_ROLL) - phoneRoll) * 0.35;
+
+      // Without input, drift gently so the frame is never dead. On phones the
+      // visitor's own hand provides the motion, so no drift there.
       const idle = now - aim.current.lastInput > 2500;
-      const ax = idle ? Math.sin(t * 0.45) * 0.55 : aim.current.x;
-      const ay = idle ? Math.sin(t * 0.31 + 1) * 0.3 : aim.current.y;
+      const ax = idle ? (fine ? Math.sin(t * 0.45) * 0.55 : 0) : aim.current.x;
+      const ay = idle ? (fine ? Math.sin(t * 0.31 + 1) * 0.3 : 0) : aim.current.y;
 
       // Hand dynamics: a loose spring that overshoots, like a wrist.
       vx = (vx + (ax - hx) * 0.045) * 0.86;
@@ -175,25 +217,39 @@ export function StabilizerDemo({
       }
 
       const roll = clamp(oRoll, MAX_ROLL);
+      // Gyroscope compensation: counter-rotate by the phone's roll when on.
+      const comp = tilt ? -phoneRoll * (1 - offAmount) : 0;
+      // What the recorded horizon does relative to the real one.
+      const horizon = tilt ? phoneRoll + roll + comp : roll;
+
       if (frame.current) {
         const tx = ox * 3.2; // vw
         const ty = oy * 2.4; // vh
         const ry = ox * 5;
         const rx = -oy * 3.5;
-        const scale = 1.14 + 0.08 * offAmount;
-        frame.current.style.transform = `translate3d(${tx}vw, ${ty}vh, 0) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${roll}deg) scale(${scale})`;
+        // Rotating a W×H frame by a needs cos(a) + max(W/H, H/W)·sin(a) to cover it.
+        const a = (Math.abs(roll + comp) * Math.PI) / 180;
+        const ratio = Math.max(box.w / box.h, box.h / box.w) || 1;
+        const cover = tilt ? Math.cos(a) + ratio * Math.sin(a) : 1;
+        const scale = (1.14 + 0.08 * offAmount) * Math.max(1, cover);
+        frame.current.style.transform = `translate3d(${tx}vw, ${ty}vh, 0) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${roll + comp}deg) scale(${scale})`;
+      }
+      if (levelLine.current) {
+        // On phones the level line is a real level: it marks the true horizon.
+        levelLine.current.style.transform = tilt ? `rotate(${-phoneRoll}deg)` : "";
       }
 
       if (now - lastSample > 33) {
         lastSample = now;
-        raw.push(handRoll);
+        const range = tilt ? MAX_PHONE_ROLL : MAX_ROLL;
+        raw.push(tilt ? phoneRoll + handRoll * 0.3 : handRoll);
         raw.shift();
-        out.push(roll);
+        out.push(horizon);
         out.shift();
-        rawLine.current?.setAttribute("points", points(raw));
-        outLine.current?.setAttribute("points", points(out));
+        rawLine.current?.setAttribute("points", points(raw, range));
+        outLine.current?.setAttribute("points", points(out, range));
         if (readout.current) {
-          readout.current.textContent = `${roll.toFixed(1).replace("-0.0", "0.0")}°`;
+          readout.current.textContent = `${horizon.toFixed(1).replace("-0.0", "0.0")}°`;
         }
       }
 
@@ -209,16 +265,17 @@ export function StabilizerDemo({
 
     if (reduced) {
       for (let i = 0; i < SAMPLES; i++) raw[i] = Math.sin(i * 0.3) * 4 + Math.sin(i * 1.7) * 1.2;
-      rawLine.current?.setAttribute("points", points(raw));
-      outLine.current?.setAttribute("points", points(out));
+      rawLine.current?.setAttribute("points", points(raw, MAX_ROLL));
+      outLine.current?.setAttribute("points", points(out, MAX_ROLL));
       if (frame.current) frame.current.style.transform = "scale(1.14)";
-    } else {
+    } else if (fine) {
       el.addEventListener("pointermove", onMove, { passive: true });
       el.addEventListener("pointerleave", onLeave);
     }
 
     return () => {
       io.disconnect();
+      ro.disconnect();
       cancelAnimationFrame(raf);
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerleave", onLeave);
@@ -237,8 +294,12 @@ export function StabilizerDemo({
 
       {overlay}
 
-      {/* HUD level line: always level, because it is the HUD. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-[12%] top-1/2 h-px bg-hud/80">
+      {/* HUD level line: level with the screen on desktop; on phones it tracks the true horizon. */}
+      <div
+        ref={levelLine}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-[12%] top-1/2 h-px bg-hud/80"
+      >
         <span className="absolute -top-1.5 left-0 h-3.5 w-px bg-hud" />
         <span className="absolute -top-1.5 right-0 h-3.5 w-px bg-hud" />
         <span className="absolute -top-3 left-1/2 h-6 w-px -translate-x-1/2 bg-focus" />
@@ -247,53 +308,62 @@ export function StabilizerDemo({
       <div className="absolute inset-x-4 bottom-4 sm:inset-x-8 sm:bottom-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              aria-pressed={on}
-              onClick={() => setOn((v) => !v)}
-              className={cn(
-                "group flex items-center gap-3 rounded-full border px-5 py-3 font-display text-lg font-semibold tracking-[0.12em] uppercase transition-colors duration-300",
-                on
-                  ? "border-focus bg-focus text-ink"
-                  : "border-hud/70 bg-ink/50 text-hud hover:border-hud",
-              )}
-            >
-              <span
-                aria-hidden="true"
+            {touch && (gyro === "idle" || gyro === "starting") ? (
+              <button
+                type="button"
+                onClick={startGyro}
+                disabled={gyro === "starting"}
+                className="flex items-center gap-3 rounded-full bg-focus px-5 py-3 font-display text-lg font-semibold tracking-[0.12em] text-ink uppercase transition-opacity disabled:opacity-70"
+              >
+                <span aria-hidden="true" className="relative grid h-5 w-5 place-items-center rounded-full border-2 border-ink">
+                  <span className="h-px w-3 bg-ink" />
+                </span>
+                {gyro === "starting" ? "Starting…" : "Test the stabilizer"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => setOn((v) => !v)}
                 className={cn(
-                  "relative h-5 w-9 rounded-full border transition-colors",
-                  on ? "border-ink bg-ink" : "border-hud/70",
+                  "group flex items-center gap-3 rounded-full border px-5 py-3 font-display text-lg font-semibold tracking-[0.12em] uppercase transition-colors duration-300",
+                  on
+                    ? "border-focus bg-focus text-ink"
+                    : "border-hud/70 bg-ink/50 text-hud hover:border-hud",
                 )}
               >
                 <span
+                  aria-hidden="true"
                   className={cn(
-                    "absolute top-0.5 h-3.5 w-3.5 rounded-full transition-[left,background-color] duration-300 ease-out-expo",
-                    on ? "left-[18px] bg-focus" : "left-0.5 bg-hud",
+                    "relative h-5 w-9 rounded-full border transition-colors",
+                    on ? "border-ink bg-ink" : "border-hud/70",
                   )}
-                />
-              </span>
-              Stabilizer {on ? "on" : "off"}
-            </button>
-
-            {needsPermission && !tiltActive && !tiltDenied && (
-              <button
-                type="button"
-                onClick={requestTilt}
-                className="rounded-full border border-hud/70 bg-ink/50 px-4 py-3 font-display text-base font-semibold tracking-[0.12em] text-hud uppercase backdrop-blur-sm transition-colors hover:border-hud"
-              >
-                Steer with tilt
+                >
+                  <span
+                    className={cn(
+                      "absolute top-0.5 h-3.5 w-3.5 rounded-full transition-[left,background-color] duration-300 ease-out-expo",
+                      on ? "left-[18px] bg-focus" : "left-0.5 bg-hud",
+                    )}
+                  />
+                </span>
+                Stabilizer {on ? "on" : "off"}
               </button>
             )}
             <p className="rounded-sm bg-ink/60 px-2 py-1 font-mono text-[11px] tracking-wider text-hud-dim uppercase backdrop-blur-sm">
-              <span className="hidden [@media(pointer:fine)]:inline">Move your pointer to steer</span>
-              <span className="[@media(pointer:fine)]:hidden">
-                {tiltActive ? "Tilt your phone to steer" : "Drag across the frame to steer"}
-              </span>
+              {!touch
+                ? "Move your pointer to steer"
+                : gyro === "active"
+                  ? on
+                    ? "Tilt your phone: the horizon holds"
+                    : "Off: the horizon tilts with you"
+                  : gyro === "unavailable"
+                    ? "No motion sensor available"
+                    : "Uses your phone's motion sensor"}
             </p>
           </div>
 
           <div className="font-mono text-xs tracking-wider text-hud-dim uppercase">
-            Roll <span ref={readout} className="tabular inline-block w-12 text-right text-hud">0.0°</span>
+            Horizon <span ref={readout} className="tabular inline-block w-12 text-right text-hud">0.0°</span>
           </div>
         </div>
 
