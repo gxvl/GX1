@@ -12,7 +12,7 @@ import { kits, specs } from "@/lib/catalog";
 import { formatPrice } from "@/lib/region";
 
 import street from "@/assets/posters/street.jpg";
-import pov from "@/assets/posters/pov.jpg";
+import beach from "@/assets/posters/beach.jpg";
 import kyoto from "@/assets/footage/kyoto-dusk.jpg";
 import kyotoPhone from "@/assets/footage/kyoto-dusk-phone.jpg";
 import waterfront from "@/assets/footage/waterfront.jpg";
@@ -173,12 +173,12 @@ export default function Home({ searchParams }: PageProps<"/">) {
             >
               <FootageVideo
                 id="pov-footage"
-                poster={pov}
-                src="/video/pov-1080.mp4"
+                poster={beach}
+                src="/video/beach-1080.mp4"
                 // Phones crop the 16:9 frame to a narrow slice and the gyro mode
                 // zooms up to ~2x, so they need the full 1080p file here.
-                srcSmall="/video/pov-1080.mp4"
-                alt="First-person view walking along a sunlit dirt path through a tall beech and pine forest."
+                srcSmall="/video/beach-1080.mp4"
+                alt="First-person view walking down a wooden boardwalk with yellow-striped steps toward a sunny beach, dune buggies and the open sea."
               />
             </StabilizerDemo>
           }

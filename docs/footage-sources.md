@@ -4,14 +4,14 @@ These stand in for GX1 footage in a fictional showcase. None of it is real GX1 o
 
 ## Video (Pexels License)
 
-4K masters, re-encoded with ffmpeg into web versions (H.264, no audio, faststart): a desktop size and a phone size per clip.
+Masters (4K unless noted), re-encoded with ffmpeg into web versions (H.264, no audio, faststart): a desktop size and a phone size per clip.
 
 | File | Source | Master |
 |---|---|---|
 | `public/video/street-1440.mp4`, `street-720.mp4` | [Pexels video 2836342](https://www.pexels.com/video/backside-of-people-walking-on-a-street-sidewalk-2836342/), first 12 s | 3840×2160, 23.976 fps |
-| `public/video/pov-1080.mp4` (served to phones too: the gyro mode zooms up to ~2×) | [Pexels video 15211027](https://www.pexels.com/video/point-of-view-of-a-person-walking-along-a-forest-path-15211027/), 10 s from 0:02, light denoise (foliage is costly to encode) | 3840×2160, 23.976 fps |
+| `public/video/beach-1080.mp4` (also served to phones: the gyro mode zooms up to ~2×) | [Pexels video 6319741](https://www.pexels.com/video/person-walking-to-the-beach-6319741/), first 28.5 s, light denoise | listed as 4K, file served at 2560×1440, 29.97 fps |
 | `src/assets/posters/street.jpg` | first frame of 2836342 (4K) | |
-| `src/assets/posters/pov.jpg` | frame at 0:02 of 15211027 (4K) | |
+| `src/assets/posters/beach.jpg` | frame at 0:00.5 of 6319741 (1440p master) | |
 
 ## Stills (Unsplash License)
 

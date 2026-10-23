@@ -38,18 +38,38 @@ export function FootageVideo({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
     el.src = window.matchMedia("(max-width: 767px)").matches ? srcSmall : src;
+    let visible = false;
+    const resume = () => {
+      if (visible && !el.dataset.userPaused && el.paused) el.play().catch(() => {});
+    };
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !el.dataset.userPaused) {
-          el.play().catch(() => {});
-        } else {
-          el.pause();
-        }
+        visible = entry.isIntersecting;
+        if (visible) resume();
+        else el.pause();
       },
       { threshold: 0.15 },
     );
     io.observe(el);
-    return () => io.disconnect();
+
+    // Watchdog: browsers sometimes pause a heavily transformed or re-laid-out
+    // video on their own (phone rotation, power heuristics). If it's on screen
+    // and the visitor didn't pause it, play it again.
+    // `visible` is already false when we pause it for being off screen,
+    // so only pauses the visitor didn't ask for get undone.
+    const onPause = () => requestAnimationFrame(resume);
+    const onVisibility = () => document.visibilityState === "visible" && resume();
+    el.addEventListener("pause", onPause);
+    window.addEventListener("resize", resume);
+    window.addEventListener("orientationchange", resume);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      io.disconnect();
+      el.removeEventListener("pause", onPause);
+      window.removeEventListener("resize", resume);
+      window.removeEventListener("orientationchange", resume);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [src, srcSmall]);
 
   return (

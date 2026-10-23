@@ -138,6 +138,9 @@ export function StabilizerDemo({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Pointer steering is a desktop thing; phones use the gyroscope instead.
     const fine = window.matchMedia("(pointer: fine)").matches;
+    // Phones get flat 2D transforms only: WebKit can stall or pause video
+    // inside large 3D-transformed layers.
+    el.style.perspective = fine ? "1400px" : "none";
 
     const raw: number[] = Array(SAMPLES).fill(0);
     const out: number[] = Array(SAMPLES).fill(0);
@@ -232,7 +235,9 @@ export function StabilizerDemo({
         const ratio = Math.max(box.w / box.h, box.h / box.w) || 1;
         const cover = tilt ? Math.cos(a) + ratio * Math.sin(a) : 1;
         const scale = (1.14 + 0.08 * offAmount) * Math.max(1, cover);
-        frame.current.style.transform = `translate3d(${tx}vw, ${ty}vh, 0) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${roll + comp}deg) scale(${scale})`;
+        frame.current.style.transform = fine
+          ? `translate3d(${tx}vw, ${ty}vh, 0) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${roll + comp}deg) scale(${scale})`
+          : `translate(${tx}vw, ${ty}vh) rotate(${roll + comp}deg) scale(${scale})`;
       }
       if (levelLine.current) {
         // On phones the level line is a real level: it marks the true horizon.
@@ -283,7 +288,7 @@ export function StabilizerDemo({
   }, []);
 
   return (
-    <div ref={root} className="absolute inset-0 touch-pan-y overflow-hidden [perspective:1400px]">
+    <div ref={root} className="absolute inset-0 touch-pan-y overflow-hidden">
       <div
         ref={frame}
         className="absolute inset-0 will-change-transform"
