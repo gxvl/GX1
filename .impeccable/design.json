@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-23T00:00:00Z",
+  "title": "Design System: GX1",
+  "extensions": {
+    "colorMeta": {
+      "rec": { "role": "primary", "displayName": "REC Red", "canonical": "#ff2d2d", "tonalRamp": ["#4c0000", "#850000", "#bd0000", "#f50000", "#ff2d2d", "#ff6666", "#ffa3a3", "#ffe5e5"] },
+      "focus": { "role": "secondary", "displayName": "Focus Yellow", "canonical": "#ffd400", "tonalRamp": ["#4c4000", "#856e00", "#bd9d00", "#f5cc00", "#ffd400", "#ffe566", "#fff0a3", "#fffbe5"] },
+      "hud": { "role": "neutral", "displayName": "HUD White", "canonical": "#f5f5f0", "tonalRamp": ["#262624", "#42423e", "#5e5e59", "#7a7a74", "#96968f", "#b2b2ab", "#d1d1cb", "#f5f5f0"] },
+      "hud-dim": { "role": "neutral", "displayName": "HUD Dim", "canonical": "rgb(245 245 240 / 0.68)", "tonalRamp": ["rgb(245 245 240 / 0.12)", "rgb(245 245 240 / 0.2)", "rgb(245 245 240 / 0.32)", "rgb(245 245 240 / 0.44)", "rgb(245 245 240 / 0.56)", "rgb(245 245 240 / 0.68)", "rgb(245 245 240 / 0.8)", "rgb(245 245 240 / 0.92)"] },
+      "hud-faint": { "role": "neutral", "displayName": "HUD Faint", "canonical": "rgb(245 245 240 / 0.32)", "tonalRamp": ["rgb(245 245 240 / 0.08)", "rgb(245 245 240 / 0.12)", "rgb(245 245 240 / 0.15)", "rgb(245 245 240 / 0.2)", "rgb(245 245 240 / 0.25)", "rgb(245 245 240 / 0.32)", "rgb(245 245 240 / 0.4)", "rgb(245 245 240 / 0.5)"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0b0b0b", "tonalRamp": ["#0b0b0b", "#262626", "#424242", "#5e5e5e", "#7a7a7a", "#969696", "#b2b2b2", "#d1d1d1"] },
+      "panel": { "role": "neutral", "displayName": "Panel Ink", "canonical": "rgb(11 11 11 / 0.72)", "tonalRamp": ["rgb(11 11 11 / 0.45)", "rgb(11 11 11 / 0.55)", "rgb(11 11 11 / 0.65)", "rgb(11 11 11 / 0.72)", "rgb(11 11 11 / 0.75)", "rgb(11 11 11 / 0.8)", "rgb(11 11 11 / 0.85)", "rgb(11 11 11 / 0.9)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The hero headline only, inside yellow focus brackets." },
+      "headline": { "displayName": "Headline", "purpose": "One per take; condensed caps over footage." },
+      "title": { "displayName": "Title", "purpose": "Spec labels, kit names, credit roles, button text, Note titles." },
+      "body": { "displayName": "Body", "purpose": "Reading copy, usually inside an ink caption chip over footage." },
+      "label": { "displayName": "HUD Label", "purpose": "HUD bar, nav links, toggles, legends." },
+      "mono": { "displayName": "Measurement Mono", "purpose": "Timecode, slates, exposure, degrees, prices, spec values, file paths." }
+    },
+    "shadows": [
+      { "name": "headline-lift", "value": "0 2px 28px rgb(0 0 0 / 0.55)", "purpose": "Text-shadow on section headlines over footage without a left scrim. Legibility only." },
+      { "name": "note-float", "value": "0 12px 32px rgba(0,0,0,0.45)", "purpose": "Director's-commentary Notes floating above the take." },
+      { "name": "device-drop", "value": "drop-shadow(0 24px 32px rgba(0,0,0,0.45))", "purpose": "The GX1 device illustration in the configurator." },
+      { "name": "scrim-left", "value": "linear-gradient(90deg, rgb(11 11 11 / 0.66) 0%, rgb(11 11 11 / 0.3) 38%, rgb(11 11 11 / 0) 58%), linear-gradient(180deg, rgb(11 11 11 / 0.4) 0%, rgb(11 11 11 / 0) 16%)", "purpose": "Local scrim for left-set take content (hero, specs)." },
+      { "name": "scrim-corner", "value": "radial-gradient(ellipse 65% 50% at 0% 0%, rgb(11 11 11 / 0.8), rgb(11 11 11 / 0) 70%)", "purpose": "Local scrim anchored at the corner where the headline sits (sensor, stabilize; bottom-left variant for punch-in)." },
+      { "name": "scrim-top", "value": "linear-gradient(180deg, rgb(11 11 11 / 0.85) 0%, rgb(11 11 11 / 0.55) 32%, rgb(11 11 11 / 0) 58%, rgb(11 11 11 / 0.5) 100%)", "purpose": "Top-set content with a caption bar at the bottom (captions)." }
+    ],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The one easing curve for state transitions, the shutter morph, push-in and device-in." },
+      { "name": "push-in", "value": "24s ease-out-expo, scale 1.02 → 1.09", "purpose": "Slow handheld push on hero footage. Off under reduced motion." },
+      { "name": "rec-blink", "value": "1.2s steps(1) infinite, opacity 0.15 at 50%", "purpose": "REC dot and pending states. Off under reduced motion." },
+      { "name": "device-in", "value": "600ms ease-out-expo, from translateY(14px) scale(0.97) blur(6px) opacity 0", "purpose": "Device preview on finish change, motion-safe only." },
+      { "name": "state", "value": "200–300ms", "purpose": "Color, border and toggle transitions." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Shutter Button",
+      "kind": "button",
+      "refersTo": "button-shutter",
+      "description": "The hero's primary action: a REC disc in a white ring that morphs to a stop square on hover.",
+      "html": "<a class=\"ds-shutter\" href=\"#configure\"><span class=\"ds-shutter-ring\"><span class=\"ds-shutter-disc\"></span></span>Configure GX1</a>",
+      "css": ".ds-shutter { display: inline-flex; align-items: center; gap: 16px; padding: 4px 24px 4px 4px; border-radius: 9999px; color: var(--hud, #f5f5f0); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: background-color 0.2s; } .ds-shutter:hover { background: rgb(245 245 240 / 0.1); } .ds-shutter:focus-visible { outline: 2px solid var(--focus, #ffd400); outline-offset: 3px; } .ds-shutter-ring { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 9999px; border: 3px solid var(--hud, #f5f5f0); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); } .ds-shutter:hover .ds-shutter-ring { transform: scale(0.95); } .ds-shutter-disc { width: 44px; height: 44px; border-radius: 9999px; background: var(--rec, #ff2d2d); transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1); } .ds-shutter:hover .ds-shutter-disc { width: 28px; height: 28px; border-radius: 6px; }"
+    },
+    {
+      "name": "HUD Pill",
+      "kind": "button",
+      "refersTo": "button-hud-pill",
+      "description": "The HUD bar's Configure link: white pill that turns focus yellow on hover.",
+      "html": "<a class=\"ds-hud-pill\" href=\"#configure\">Configure</a>",
+      "css": ".ds-hud-pill { display: inline-block; padding: 6px 16px; border-radius: 9999px; background: var(--hud, #f5f5f0); color: var(--ink, #0b0b0b); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: background-color 0.2s; } .ds-hud-pill:hover { background: var(--focus, #ffd400); } .ds-hud-pill:focus-visible { outline: 2px solid var(--focus, #ffd400); outline-offset: 3px; }"
+    },
+    {
+      "name": "Toggle",
+      "kind": "button",
+      "refersTo": "toggle-off",
+      "description": "Commentary / stabilizer toggle: outlined pill off, focus-yellow fill on.",
+      "html": "<button class=\"ds-toggle\" aria-pressed=\"false\"><span class=\"ds-toggle-dot\"></span>Commentary</button> <button class=\"ds-toggle\" aria-pressed=\"true\"><span class=\"ds-toggle-dot\"></span>Commentary</button>",
+      "css": ".ds-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 9999px; border: 1px solid rgb(245 245 240 / 0.4); background: transparent; color: var(--hud, #f5f5f0); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background-color 0.2s, border-color 0.2s, color 0.2s; } .ds-toggle:hover { border-color: var(--hud, #f5f5f0); } .ds-toggle:focus-visible { outline: 2px solid var(--focus, #ffd400); outline-offset: 3px; } .ds-toggle-dot { width: 8px; height: 8px; border-radius: 9999px; background: var(--focus, #ffd400); } .ds-toggle[aria-pressed='true'] { background: var(--focus, #ffd400); border-color: var(--focus, #ffd400); color: var(--ink, #0b0b0b); } .ds-toggle[aria-pressed='true'] .ds-toggle-dot { background: var(--ink, #0b0b0b); }"
+    },
+    {
+      "name": "Email Field + Reserve",
+      "kind": "input",
+      "refersTo": "input-email",
+      "description": "Pill email field on translucent ink with the REC-red Reserve button seated inside.",
+      "html": "<div class=\"ds-field\"><input class=\"ds-field-input\" type=\"email\" placeholder=\"you@studio.com\" aria-label=\"Email address\"><button class=\"ds-reserve\"><span class=\"ds-reserve-dot\"></span>Reserve</button></div>",
+      "css": ".ds-field { position: relative; height: 56px; width: 100%; max-width: 520px; border-radius: 9999px; border: 1px solid rgb(245 245 240 / 0.4); background: rgb(11 11 11 / 0.7); transition: border-color 0.2s; } .ds-field:focus-within { border-color: var(--focus, #ffd400); } .ds-field-input { width: 100%; height: 100%; padding: 0 160px 0 24px; border: none; background: transparent; color: var(--hud, #f5f5f0); font-family: Barlow, system-ui, sans-serif; font-size: 1rem; caret-color: var(--focus, #ffd400); outline: none; border-radius: 9999px; } .ds-field-input::placeholder { color: rgb(245 245 240 / 0.68); } .ds-reserve { position: absolute; top: 6px; right: 6px; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 20px; border: none; border-radius: 9999px; background: var(--rec, #ff2d2d); color: var(--hud, #f5f5f0); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 1.125rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; } .ds-reserve:hover { opacity: 0.9; } .ds-reserve:focus-visible { outline: 2px solid var(--focus, #ffd400); outline-offset: 3px; } .ds-reserve-dot { width: 10px; height: 10px; border-radius: 9999px; background: var(--hud, #f5f5f0); }"
+    },
+    {
+      "name": "HUD Bar",
+      "kind": "nav",
+      "refersTo": "hud-bar",
+      "description": "The viewfinder's fixed top line: wordmark, REC with timecode, dim caps nav.",
+      "html": "<header class=\"ds-hud\"><div class=\"ds-hud-left\"><span class=\"ds-hud-mark\">GX1</span><span class=\"ds-hud-rec\"><span class=\"ds-hud-recdot\"></span>Rec <span class=\"ds-hud-tc\">00:04:15:12</span></span></div><nav><a href=\"#\">Stabilize</a><a href=\"#\">Sensor</a><a href=\"#\">Specs</a></nav></header>",
+      "css": ".ds-hud { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 32px; background: linear-gradient(180deg, rgb(11 11 11 / 0.6), rgb(11 11 11 / 0)); color: var(--hud, #f5f5f0); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; } .ds-hud-left { display: flex; align-items: center; gap: 20px; } .ds-hud-mark { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; text-transform: none; } .ds-hud-rec { display: flex; align-items: center; gap: 8px; color: var(--rec, #ff2d2d); } .ds-hud-recdot { width: 10px; height: 10px; border-radius: 9999px; background: var(--rec, #ff2d2d); } .ds-hud-tc { color: var(--hud, #f5f5f0); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 0.875rem; font-variant-numeric: tabular-nums; } .ds-hud nav { display: flex; gap: 24px; } .ds-hud nav a { color: rgb(245 245 240 / 0.68); text-decoration: none; transition: color 0.2s; } .ds-hud nav a:hover { color: var(--hud, #f5f5f0); } .ds-hud nav a:focus-visible { outline: 2px solid var(--focus, #ffd400); outline-offset: 3px; }"
+    },
+    {
+      "name": "Clip Slate + Caption Chip",
+      "kind": "chip",
+      "refersTo": "caption-chip",
+      "description": "Mono clip slate and the ink caption chip that carries body copy over footage.",
+      "html": "<div class=\"ds-chip-stage\"><p class=\"ds-slate\"><span>A002</span> · 00:07:40</p><p class=\"ds-caption\">Three motors correct every wobble before it reaches the sensor.</p></div>",
+      "css": ".ds-chip-stage { padding: 24px; background: linear-gradient(135deg, #7a6a55, #c9b48f); display: flex; flex-direction: column; gap: 16px; align-items: flex-start; } .ds-slate { margin: 0; padding: 4px 8px; border-radius: 4px; background: rgb(11 11 11 / 0.65); backdrop-filter: blur(4px); color: rgb(245 245 240 / 0.68); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-variant-numeric: tabular-nums; } .ds-slate span { color: var(--hud, #f5f5f0); } .ds-caption { margin: 0; max-width: 28rem; padding: 8px 12px; border-radius: 4px; background: rgb(11 11 11 / 0.75); backdrop-filter: blur(4px); color: var(--hud, #f5f5f0); font-family: Barlow, system-ui, sans-serif; font-size: 1.125rem; line-height: 1.625; }"
+    },
+    {
+      "name": "Camera-Menu Panel",
+      "kind": "card",
+      "refersTo": "menu-panel",
+      "description": "The only ink plane: spec rows with dim caps labels, mono values, a yellow caret on the active row.",
+      "html": "<dl class=\"ds-menu\"><div class=\"ds-menu-row\"><dt><span class=\"ds-caret ds-caret-on\"></span>Sensor</dt><dd>1-inch, 20 MP</dd></div><div class=\"ds-menu-row\"><dt><span class=\"ds-caret\"></span>Weight</dt><dd>118 g</dd></div></dl>",
+      "css": ".ds-menu { margin: 0; padding: 8px 28px; border-radius: 6px; background: rgb(11 11 11 / 0.8); backdrop-filter: blur(12px); max-width: 520px; } .ds-menu-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 16px 0; border-bottom: 1px solid rgb(245 245 240 / 0.15); } .ds-menu-row:last-child { border-bottom: none; } .ds-menu dt { display: flex; align-items: baseline; gap: 12px; color: rgb(245 245 240 / 0.68); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 1.125rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; } .ds-menu dd { margin: 0; color: var(--hud, #f5f5f0); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 0.875rem; font-variant-numeric: tabular-nums; text-align: right; } .ds-caret { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid transparent; } .ds-caret-on { border-left-color: var(--focus, #ffd400); }"
+    },
+    {
+      "name": "Focus Brackets",
+      "kind": "custom",
+      "refersTo": "focus-brackets",
+      "description": "The signature mark: four yellow L-corners drawn with background gradients, framing whatever is in focus.",
+      "html": "<div class=\"ds-brackets\"><span>Walk.<br>It stays level.</span></div>",
+      "css": ".ds-brackets { --b: 2px; --l: 28px; --c: var(--focus, #ffd400); display: inline-block; padding: 28px 40px; background: linear-gradient(var(--c) 0 0) top left / var(--l) var(--b), linear-gradient(var(--c) 0 0) top left / var(--b) var(--l), linear-gradient(var(--c) 0 0) top right / var(--l) var(--b), linear-gradient(var(--c) 0 0) top right / var(--b) var(--l), linear-gradient(var(--c) 0 0) bottom left / var(--l) var(--b), linear-gradient(var(--c) 0 0) bottom left / var(--b) var(--l), linear-gradient(var(--c) 0 0) bottom right / var(--l) var(--b), linear-gradient(var(--c) 0 0) bottom right / var(--b) var(--l); background-repeat: no-repeat; background-color: #0b0b0b; color: var(--hud, #f5f5f0); font-family: 'Barlow Condensed', system-ui, sans-serif; font-size: 3rem; font-weight: 700; line-height: 0.88; text-transform: uppercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Live Viewfinder",
+    "overview": "The page is the camera's own screen, and every scroll is a take. Each section is daylight footage running edge to edge, with a thin white HUD laid over it: a recording line at the top, a clip slate in the corner, readouts along the bottom edge, and focus brackets around whatever matters. The interface doesn't sit next to the footage. It sits on it, the way a camera's overlay does.\n\nThe system is sparse and functional. It has one off-white for the HUD, one red that means recording and the primary action, and one yellow that means focus. Barlow Condensed caps carry the HUD and the headlines, Barlow carries reading text, and Geist Mono is kept for timecode and measurements. Depth comes from local scrims and translucent ink chips, never from lit surfaces. The only flat ink plane is the camera-menu panel, which appears where the visitor reads or chooses: specs, configurator, and credits. The page deliberately avoids the category's usual floating product render on black.",
+    "keyCharacteristics": [
+      "Full-bleed photographic takes (`min-height: 100svh`), each with a clip slate and timecode.",
+      "A thin off-white HUD over footage, set in condensed tracked caps.",
+      "Red for recording and the primary action, and yellow for focus. Each color has one meaning.",
+      "Legibility comes from local scrims and ink caption chips, never from darkening the whole frame.",
+      "Focus brackets and a level line are the signature marks.",
+      "No glows, no gradient text, and every motion has a reduced-motion path."
+    ],
+    "rules": [
+      { "name": "The One Meaning Rule", "body": "Red means recording or \"do it now\". Yellow means \"this is in focus or selected\". Neither color is ever used as plain decoration, and they never swap roles.", "section": "colors" },
+      { "name": "The Ink Is the Menu Rule", "body": "A solid or near-solid ink plane (`bg-ink/80` and above, `rounded-md`) appears only where the camera's menu would: specs, the configurator, and the end credits. Everything else floats over footage.", "section": "colors" },
+      { "name": "The Mono Is Measurement Rule", "body": "Geist Mono is used only for numbers a camera would display (timecode, exposure, degrees, prices, spec values) and for code file paths. It is never used for prose or headings.", "section": "typography" },
+      { "name": "The Caps Are HUD Rule", "body": "Anything that belongs to the camera interface is set in Barlow Condensed uppercase with positive tracking. Reading text stays in sentence case Barlow.", "section": "typography" },
+      { "name": "The Level Line Rule", "body": "The hero's level line spans the whole frame at every width by pulling outward through the gutter (negative margins that match the gutter). It is the thesis, so it is never cropped to the content column.", "section": "layout" },
+      { "name": "The Local Scrim Rule", "body": "Darken only where the words are. Use a gradient anchored to the text's corner or edge. Never put a whole-frame dark overlay on footage that has no panel.", "section": "elevation" },
+      { "name": "The No Glow Rule", "body": "Shadows are black and serve legibility or separation. No coloured glows, no light-emitting edges, and no gradient text.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do run every section as a full-bleed take at `100svh` or taller, with its own clip slate and timecode.",
+      "Do put body copy over footage in an ink caption chip (`bg-ink/75`, 4px corners, `backdrop-blur-sm`) unless a local scrim already sits directly under it.",
+      "Do protect text with a local scrim (radial, left, or top) anchored where the text sits, and leave the rest of the frame in daylight.",
+      "Do reserve REC Red (#ff2d2d) for recording state and the primary action, and Focus Yellow (#ffd400) for focus and selection.",
+      "Do set HUD elements in Barlow Condensed caps with 0.1 to 0.2em tracking, and numbers in Geist Mono with tabular numerals.",
+      "Do frame the thing in focus with focus brackets rather than a box or a card.",
+      "Do give every animation a reduced-motion path and pause loops off-screen.",
+      "Do rebuild any third-party effect into the HUD grammar (brackets, hairlines, mono readouts, ink chips) before shipping it."
+    ],
+    "donts": [
+      "Don't darken a whole footage frame to make text readable. The only exception is a take that holds a menu panel.",
+      "Don't use solid ink panels outside the camera-menu roles (specs, configurator, credits).",
+      "Don't use glows, coloured shadows, or gradient text. Shadows are black and exist for legibility.",
+      "Don't float a product render on a black void as the hero. Footage carries the hero.",
+      "Don't use Geist Mono for prose or headings, or Barlow Condensed for reading paragraphs.",
+      "Don't add a third accent hue. New states should map to red (action or recording), yellow (focus), or HUD White."
+    ]
+  }
+}

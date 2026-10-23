@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GX1 Direction Previews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600&family=Barlow+Condensed:wght@400;600;700&family=Anton&family=Archivo+Black&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#222;font-family:system-ui,sans-serif}
+  .switch{position:fixed;z-index:99;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:6px;background:rgba(20,20,20,.88);padding:6px;border-radius:999px;backdrop-filter:blur(8px)}
+  .switch a{color:#ddd;text-decoration:none;font:600 12px/1 system-ui;padding:9px 14px;border-radius:999px;white-space:nowrap}
+  .switch a:hover{background:#444;color:#fff}
+  section{position:relative;min-height:100vh;overflow:hidden}
+  .tag{position:absolute;z-index:20;top:12px;right:12px;font:600 11px/1 system-ui;letter-spacing:.08em;text-transform:uppercase;background:#000;color:#fff;padding:7px 10px;border-radius:4px}
+
+  /* ---------- 1. OWNER'S MANUAL ---------- */
+  #manual{background:#f2f2ee;color:#111214;font-family:'Schibsted Grotesk',sans-serif;display:grid;grid-template-rows:auto 1fr auto}
+  #manual .crop{position:absolute;width:22px;height:22px;border-color:#111214;border-style:solid;opacity:.5}
+  #manual .c1{top:14px;left:14px;border-width:0 1px 1px 0}
+  #manual .c2{top:14px;right:14px;border-width:0 0 1px 1px}
+  #manual .c3{bottom:14px;left:14px;border-width:1px 1px 0 0}
+  #manual .c4{bottom:14px;right:14px;border-width:1px 0 0 1px}
+  #manual nav{display:flex;justify-content:space-between;align-items:baseline;padding:32px 48px 0;font:400 12px/1.4 'JetBrains Mono',monospace;border-bottom:1px solid #111214;margin:0 48px;padding:32px 0 12px}
+  #manual nav b{font-family:'Schibsted Grotesk';font-weight:900;font-size:18px;letter-spacing:-.02em}
+  #manual nav ol{display:flex;gap:28px;list-style:none}
+  #manual nav li span{opacity:.45;margin-left:6px}
+  #manual .body{display:grid;grid-template-columns:minmax(320px,5fr) 7fr;gap:24px;padding:28px 48px 0}
+  #manual h1{font-weight:900;font-size:clamp(120px,17vw,250px);line-height:.8;letter-spacing:-.06em}
+  #manual .sub{font:400 13px/1.5 'JetBrains Mono',monospace;margin-top:18px;text-transform:uppercase;letter-spacing:.04em}
+  #manual .step{margin-top:36px;border-top:1px solid #111214;padding-top:14px;max-width:420px}
+  #manual .step .n{font:600 13px 'JetBrains Mono';color:#009fe3}
+  #manual .step h2{font-weight:800;font-size:34px;line-height:1.02;letter-spacing:-.02em;margin:6px 0 10px}
+  #manual .step .caution{font-size:13px;display:flex;gap:8px;align-items:flex-start}
+  #manual .step .caution i{font-style:normal;border:1.5px solid #111214;width:18px;height:18px;display:inline-grid;place-items:center;font-weight:900;font-size:11px;flex:none;clip-path:polygon(50% 0,100% 100%,0 100%);padding-top:4px;background:#111214;color:#f2f2ee}
+  #manual svg{width:100%;height:100%;max-height:62vh}
+  #manual .band{background:#ff5a1f;margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;gap:24px}
+  #manual .band .code{font:600 13px 'JetBrains Mono';letter-spacing:.02em}
+  #manual .band .big{font-weight:900;font-size:30px;letter-spacing:-.02em}
+  #manual .band button{background:#111214;color:#f2f2ee;border:0;font:700 15px 'Schibsted Grotesk';padding:16px 26px;letter-spacing:.01em}
+  #manual .pg{position:absolute;right:48px;bottom:96px;font:400 11px 'JetBrains Mono';opacity:.5}
+
+  /* ---------- 2. LIVE VIEWFINDER ---------- */
+  #viewfinder{background:#000 url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1800&q=70") center/cover;color:#f5f5f5;font-family:'Barlow Condensed',sans-serif}
+  #viewfinder::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.05) 30%,rgba(0,0,0,.05) 70%,rgba(0,0,0,.5))}
+  #viewfinder .hud{position:absolute;inset:28px;font:600 15px 'Barlow Condensed';letter-spacing:.06em}
+  #viewfinder .tl{position:absolute;top:0;left:0;display:flex;gap:14px;align-items:center}
+  #viewfinder .rec{width:12px;height:12px;border-radius:50%;background:#ff2d2d;animation:b 1s steps(2) infinite}
+  @keyframes b{50%{opacity:.2}}
+  #viewfinder .tr{position:absolute;top:0;right:0;display:flex;gap:22px}
+  #viewfinder .menu{position:absolute;top:34px;left:0;display:flex;gap:22px;opacity:.85;font-weight:400}
+  #viewfinder .horizon{position:absolute;top:50%;left:12%;right:12%;height:1px;background:rgba(255,255,255,.75)}
+  #viewfinder .horizon::before,#viewfinder .horizon::after{content:"";position:absolute;top:-6px;width:1px;height:13px;background:#fff}
+  #viewfinder .horizon::after{right:0}
+  #viewfinder .bracket{position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);padding:34px 54px;text-align:center}
+  #viewfinder .bracket i{position:absolute;width:30px;height:30px;border:2px solid #ffd400}
+  #viewfinder .bracket i:nth-child(1){top:0;left:0;border-width:2px 0 0 2px}
+  #viewfinder .bracket i:nth-child(2){top:0;right:0;border-width:2px 2px 0 0}
+  #viewfinder .bracket i:nth-child(3){bottom:0;left:0;border-width:0 0 2px 2px}
+  #viewfinder .bracket i:nth-child(4){bottom:0;right:0;border-width:0 2px 2px 0}
+  #viewfinder h1{font-weight:700;font-size:clamp(64px,9vw,140px);line-height:.88;text-transform:uppercase;text-shadow:0 2px 30px rgba(0,0,0,.35)}
+  #viewfinder .lbl{font-size:16px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}
+  #viewfinder .shutter{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:flex;align-items:center;gap:16px}
+  #viewfinder .shutter span{width:74px;height:74px;border-radius:50%;border:3px solid #fff;display:grid;place-items:center}
+  #viewfinder .shutter span::after{content:"";width:56px;height:56px;border-radius:50%;background:#ff2d2d}
+  #viewfinder .shutter b{font-size:20px;letter-spacing:.12em;text-transform:uppercase}
+  #viewfinder .histo{position:absolute;left:0;bottom:0;display:flex;align-items:flex-end;gap:2px;height:46px;width:150px;border-bottom:1px solid rgba(255,255,255,.5)}
+  #viewfinder .histo span{flex:1;background:#ffd400;opacity:.85}
+
+  /* ---------- 3. STOCKROOM TAG ---------- */
+  #stock{background:#f7f7f5;color:#0d0d0d;font-family:'Archivo Black',sans-serif;display:grid;grid-template-columns:1fr 1fr}
+  #stock nav{position:absolute;top:26px;left:40px;right:40px;display:flex;justify-content:space-between;font-size:14px;letter-spacing:.04em;z-index:2}
+  #stock nav span::before,#stock nav span::after,#stock .q::before,#stock .q::after{content:'"'}
+  #stock nav div{display:flex;gap:28px}
+  #stock .left{padding:110px 0 40px 40px;display:flex;flex-direction:column;justify-content:space-between}
+  #stock h1{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(90px,13vw,210px);line-height:.85;letter-spacing:-.01em}
+  #stock .small{font-family:'Anton';font-size:clamp(36px,4.5vw,64px);line-height:.9}
+  #stock .hazard{height:58px;margin:26px 0;background:repeating-linear-gradient(45deg,#0d0d0d 0 22px,#f7f7f5 22px 44px);display:flex;align-items:center}
+  #stock .hazard b{background:#0d0d0d;color:#f7f7f5;padding:10px 18px;margin-left:24px;font-size:18px;letter-spacing:.06em}
+  #stock .plates{display:flex;gap:10px;flex-wrap:wrap}
+  #stock .plates span{border:2px solid #0d0d0d;padding:8px 12px;font-size:14px;letter-spacing:.06em}
+  #stock .right{background:#0d0d0d;position:relative;display:grid;place-items:center}
+  #stock .hook{position:absolute;top:0;left:50%;width:4px;height:120px;background:#777}
+  #stock .cam{width:120px;height:330px;border-radius:30px;background:linear-gradient(90deg,#1c1c1c,#2e2e2e 40%,#151515);position:relative;margin-top:60px;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+  #stock .cam::before{content:"";position:absolute;top:-78px;left:20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#0a0a0a 30%,#333 32%,#222 60%,#2b2b2b 62%)}
+  #stock .cam::after{content:"";position:absolute;top:40px;left:18px;width:84px;height:110px;border-radius:8px;background:#0a0a0a}
+  #stock .zip{position:absolute;top:220px;left:-60px;transform:rotate(-14deg);background:#ff6a13;color:#0d0d0d;padding:14px 18px 14px 30px;font-size:16px;letter-spacing:.04em;clip-path:polygon(14px 0,100% 0,100% 100%,14px 100%,0 50%)}
+  #stock .reserve{position:absolute;bottom:40px;right:40px;background:#ff6a13;color:#0d0d0d;font:400 22px 'Archivo Black';padding:18px 30px 18px 42px;clip-path:polygon(18px 0,100% 0,100% 100%,18px 100%,0 50%);border:0}
+
+  /* ---------- 4. CATEGORY STANDARD ---------- */
+  #canon{background:#000;color:#fff;font-family:'Manrope',sans-serif;text-align:center}
+  #canon nav{display:flex;justify-content:space-between;padding:22px 48px;font-size:14px;color:#bbb}
+  #canon nav b{color:#fff;font-weight:800}
+  #canon nav div{display:flex;gap:30px}
+  #canon h1{font-weight:800;font-size:clamp(48px,6vw,92px);letter-spacing:-.03em;line-height:1;margin-top:7vh}
+  #canon p{color:#aaa;font-size:20px;margin-top:16px}
+  #canon .ctas{display:flex;gap:14px;justify-content:center;margin-top:26px}
+  #canon .ctas a{padding:13px 26px;border-radius:999px;font-weight:600;font-size:16px;text-decoration:none}
+  #canon .buy{background:#2f6bff;color:#fff}
+  #canon .film{color:#2f6bff;border:1px solid #2f6bff}
+  #canon .render{margin:7vh auto 0;width:140px;height:360px;border-radius:34px;background:linear-gradient(90deg,#111,#3a3a3a 35%,#1a1a1a 70%,#0c0c0c);position:relative;box-shadow:0 0 120px rgba(47,107,255,.18),0 60px 80px rgba(0,0,0,.8)}
+  #canon .render::before{content:"";position:absolute;top:-92px;left:24px;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#4a5a80 0,#0a0a0a 28%,#2a2a2a 31%,#151515 60%,#333 62%)}
+
+  @media (max-width:760px){
+    #manual nav{margin:0 20px}#manual nav ol{display:none}
+    #manual .body{grid-template-columns:1fr;padding:20px}
+    #manual .band{flex-direction:column;align-items:flex-start;padding:20px}
+    #stock{grid-template-columns:1fr}#stock .right{min-height:70vh}
+    #stock nav div{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="switch">
+  <a href="#manual">1 · Owner's Manual</a>
+  <a href="#viewfinder">2 · Live Viewfinder</a>
+  <a href="#stock">3 · Stockroom Tag</a>
+  <a href="#canon">4 · Category standard</a>
+</div>
+
+<!-- 1. THE OWNER'S MANUAL -->
+<section id="manual">
+  <span class="tag">1 · The Roll — Owner's Manual</span>
+  <i class="crop c1"></i><i class="crop c2"></i><i class="crop c3"></i><i class="crop c4"></i>
+  <nav>
+    <b>GX1</b>
+    <ol>
+      <li>Contents<span>02</span></li><li>Stabilize<span>06</span></li><li>Sensor<span>12</span></li><li>Configure<span>18</span></li><li>Reserve<span>24</span></li>
+    </ol>
+  </nav>
+  <div class="body">
+    <div>
+      <h1>GX1</h1>
+      <p class="sub">Owner's manual · Pocket stabilized camera<br>Model GX1-01 · Edition 1</p>
+      <div class="step">
+        <span class="n">§ 01</span>
+        <h2>Hold it. Walk.<br>It stays level.</h2>
+        <p class="caution"><i>!</i>Caution: the horizon will not tilt, however hard you try.</p>
+      </div>
+    </div>
+    <svg viewBox="0 0 640 520" fill="none" stroke="#111214" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-label="Exploded line drawing of the GX1">
+      <!-- axis -->
+      <line x1="300" y1="20" x2="300" y2="505" stroke-dasharray="3 6" stroke-width="1"/>
+      <!-- lens module (spot) -->
+      <circle cx="300" cy="62" r="40" fill="#009fe3"/>
+      <circle cx="300" cy="62" r="24"/><circle cx="300" cy="62" r="12"/><circle cx="292" cy="54" r="3"/>
+      <!-- yoke -->
+      <path d="M250 135 v-46 a12 12 0 0 1 12 -12 h6 M350 135 v-46 a12 12 0 0 0 -12 -12 h-6" fill="#009fe3"/>
+      <path d="M250 135 h100"/>
+      <!-- tilt motor -->
+      <rect x="340" y="48" width="22" height="30" rx="5"/>
+      <!-- pan motor ring -->
+      <ellipse cx="300" cy="170" rx="44" ry="11"/>
+      <path d="M256 170 v14 a44 11 0 0 0 88 0 v-14"/>
+      <!-- handle -->
+      <path d="M262 222 h76 a22 22 0 0 1 22 22 v178 a22 22 0 0 1 -22 22 h-76 a22 22 0 0 1 -22 -22 v-178 a22 22 0 0 1 22 -22 z"/>
+      <rect x="258" y="240" width="84" height="96" rx="6"/>
+      <circle cx="300" cy="372" r="11"/><circle cx="300" cy="372" r="5"/>
+      <line x1="276" y1="404" x2="324" y2="404"/>
+      <!-- base cap -->
+      <path d="M262 476 h76 a14 14 0 0 1 0 22 h-76 a14 14 0 0 1 0 -22 z"/>
+      <!-- leader lines + callouts -->
+      <g stroke-width="1" font-family="JetBrains Mono" font-size="11" fill="#111214">
+        <line x1="340" y1="48" x2="470" y2="30"/><circle cx="482" cy="30" r="11" fill="#f2f2ee"/><text x="477" y="34" stroke="none">01</text><text x="500" y="34" stroke="none">Lens module, 1" sensor</text>
+        <line x1="362" y1="64" x2="470" y2="78"/><circle cx="482" cy="78" r="11" fill="#f2f2ee"/><text x="477" y="82" stroke="none">02</text><text x="500" y="82" stroke="none">Tilt motor</text>
+        <line x1="350" y1="120" x2="470" y2="126"/><circle cx="482" cy="126" r="11" fill="#f2f2ee"/><text x="477" y="130" stroke="none">03</text><text x="500" y="130" stroke="none">Roll yoke</text>
+        <line x1="344" y1="176" x2="470" y2="174"/><circle cx="482" cy="174" r="11" fill="#f2f2ee"/><text x="477" y="178" stroke="none">04</text><text x="500" y="178" stroke="none">Pan motor ring</text>
+        <line x1="342" y1="288" x2="470" y2="270"/><circle cx="482" cy="270" r="11" fill="#f2f2ee"/><text x="477" y="274" stroke="none">05</text><text x="500" y="274" stroke="none">Touch display 2.0"</text>
+        <line x1="311" y1="372" x2="470" y2="340"/><circle cx="482" cy="340" r="11" fill="#f2f2ee"/><text x="477" y="344" stroke="none">06</text><text x="500" y="344" stroke="none">Shutter / record</text>
+        <line x1="240" y1="420" x2="110" y2="410"/><circle cx="98" cy="410" r="11" fill="#f2f2ee"/><text x="93" y="414" stroke="none">07</text><text x="20" y="440" stroke="none">Grip, 118 g</text>
+        <line x1="262" y1="487" x2="110" y2="487"/><circle cx="98" cy="487" r="11" fill="#f2f2ee"/><text x="93" y="491" stroke="none">08</text><text x="20" y="512" stroke="none">USB-C base</text>
+      </g>
+    </svg>
+  </div>
+  <span class="pg">— 01 —</span>
+  <div class="band">
+    <div><div class="big">Configure yours.</div><div class="code">GX1-01 / GRAPHITE / CREATOR KIT · SHIPS SPRING</div></div>
+    <button>Configure ›</button>
+  </div>
+</section>
+
+<!-- 2. LIVE VIEWFINDER -->
+<section id="viewfinder">
+  <span class="tag">2 · Pick — Live Viewfinder</span>
+  <div class="hud">
+    <div class="tl"><span class="rec"></span>REC 00:04:12:08</div>
+    <div class="tr"><span>4K · 60</span><span>ISO 200</span><span>▮▮▮▯ 82%</span></div>
+    <div class="menu"><span>STABILIZE</span><span>SENSOR</span><span>CONFIGURE</span></div>
+    <div class="horizon"></div>
+    <div class="bracket"><i></i><i></i><i></i><i></i>
+      <p class="lbl">GX1 · pocket stabilized camera</p>
+      <h1>Walk.<br>It stays level.</h1>
+    </div>
+    <div class="histo"><span style="height:20%"></span><span style="height:35%"></span><span style="height:55%"></span><span style="height:80%"></span><span style="height:95%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:75%"></span><span style="height:50%"></span><span style="height:30%"></span><span style="height:22%"></span><span style="height:12%"></span></div>
+    <div class="shutter"><span></span><b>Configure GX1</b></div>
+  </div>
+</section>
+
+<!-- 3. STOCKROOM TAG -->
+<section id="stock">
+  <span class="tag">3 · Challenger — Stockroom Tag</span>
+  <nav><span>GX1</span><div><span>SPECS</span><span>CONFIGURE</span><span>RESERVE</span></div></nav>
+  <div class="left">
+    <div>
+      <h1><span class="q">CAMERA</span></h1>
+      <p class="small"><span class="q">FOR WALKING</span></p>
+    </div>
+    <div>
+      <div class="hazard"><b>DROP 01 — GX1</b></div>
+      <div class="plates"><span class="q">STABILIZED</span><span class="q">1-INCH</span><span class="q">POCKET</span><span class="q">118 G</span></div>
+    </div>
+  </div>
+  <div class="right">
+    <span class="hook"></span>
+    <div class="cam"><span class="zip">"GX1-01"</span></div>
+    <button class="reserve">"RESERVE"</button>
+  </div>
+</section>
+
+<!-- 4. CATEGORY STANDARD -->
+<section id="canon">
+  <span class="tag">4 · Category standard</span>
+  <nav><b>GX1</b><div><span>Overview</span><span>Specs</span><span>Compare</span><span>Buy</span></div></nav>
+  <h1>GX1. Stabilized.<br>In your pocket.</h1>
+  <p>Pocket 3-axis gimbal camera with a 1-inch sensor.</p>
+  <div class="ctas"><a class="buy" href="#">Buy</a><a class="film" href="#">Watch the film ›</a></div>
+  <div class="render"></div>
+</section>
+
+</body>
+</html>

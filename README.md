@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GX1
 
-## Getting Started
+A launch page for **GX1**, a fictional pocket gimbal camera, built as a Next.js portfolio piece. The product is invented, but the engineering is real.
 
-First, run the development server:
+The whole page works as the camera's live viewfinder: daylight footage, a thin HUD, REC red and focus yellow. Turn on **Commentary** in the top bar to see which Next.js technique each section uses.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Add `?region=JP` (or `BR`, `GB`, `DE`…) to the URL to preview local pricing. On Vercel, the country comes from the request automatically.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What it demonstrates
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Principle | Where |
+|---|---|
+| Server Components by default. Six small client islands: timecode, stabilizer, compare, lens, captions and the reserve field | `src/app/page.tsx` |
+| Native `fetch` inside `'use cache'` with `cacheLife('hours')` and `cacheTag('fx')`, and no SWR or React Query | `src/lib/region.ts` |
+| Forms as backend code: a Server Action with zod, plus `useActionState` | `src/app/actions.ts`, `src/components/reserve-form.tsx` |
+| Configurator state in the URL: prefetched `<Link>`s that work with JS off | `src/components/configurator.tsx` |
+| Streaming with `<Suspense>` and `loading.tsx`, with no spinner state | `src/app/page.tsx`, `src/app/loading.tsx` |
+| `proxy.ts` forwards the visitor's country before rendering | `src/proxy.ts` |
+| Tailwind v4 tokens with no CSS-in-JS runtime | `src/app/globals.css` |
+| Cache Components and Partial Prerendering: a static shell with the configurator streamed in | `next.config.ts` |
 
-## Learn More
+Visual effects are adapted from [Aceternity UI](https://ui.aceternity.com) (Compare, Lens, Placeholders and Vanish Input, Text Generate Effect) and restyled to fit the viewfinder. Every motion effect respects `prefers-reduced-motion`.
 
-To learn more about Next.js, take a look at the following resources:
+## Credits
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Footage stills are from [Unsplash](https://unsplash.com). See `docs/footage-sources.md` for each photo. They stand in for GX1 footage and are not real output. GX1's specs and prices are fictional.

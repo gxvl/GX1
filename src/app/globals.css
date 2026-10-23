@@ -1,26 +1,152 @@
 @import "tailwindcss";
 
+/*
+  GX1 — Live Viewfinder.
+  The page is the camera's screen: daylight footage, a thin white HUD,
+  REC red for recording state, focus yellow for whatever is in focus.
+  No glows, no gradients beyond legibility scrims.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #0b0b0b;
+  --hud: #f5f5f0;
+  --hud-dim: rgb(245 245 240 / 0.68);
+  --hud-faint: rgb(245 245 240 / 0.32);
+  --rec: #ff2d2d;
+  --focus: #ffd400;
+  --panel: rgb(11 11 11 / 0.72);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-ink: var(--ink);
+  --color-hud: var(--hud);
+  --color-hud-dim: var(--hud-dim);
+  --color-hud-faint: var(--hud-faint);
+  --color-rec: var(--rec);
+  --color-focus: var(--focus);
+  --color-panel: var(--panel);
+  --font-sans: var(--font-barlow);
+  --font-display: var(--font-barlow-condensed);
   --font-mono: var(--font-geist-mono);
+  --ease-out-expo: var(--ease-out);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--ink);
+  scroll-behavior: smooth;
+  scrollbar-color: var(--hud-faint) var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--hud);
+  font-family: var(--font-barlow), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--focus);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+input {
+  caret-color: var(--focus);
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Corner focus brackets drawn with four gradients, no extra DOM. */
+.focus-brackets {
+  --b: 2px;
+  --l: 28px;
+  --c: var(--focus);
+  background:
+    linear-gradient(var(--c) 0 0) top left / var(--l) var(--b),
+    linear-gradient(var(--c) 0 0) top left / var(--b) var(--l),
+    linear-gradient(var(--c) 0 0) top right / var(--l) var(--b),
+    linear-gradient(var(--c) 0 0) top right / var(--b) var(--l),
+    linear-gradient(var(--c) 0 0) bottom left / var(--l) var(--b),
+    linear-gradient(var(--c) 0 0) bottom left / var(--b) var(--l),
+    linear-gradient(var(--c) 0 0) bottom right / var(--l) var(--b),
+    linear-gradient(var(--c) 0 0) bottom right / var(--b) var(--l);
+  background-repeat: no-repeat;
+}
+
+.focus-brackets-white {
+  --c: var(--hud);
+}
+
+/* Slow handheld push on hero footage. */
+@keyframes push-in {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.09);
+  }
+}
+
+.push-in {
+  animation: push-in 24s var(--ease-out) both;
+}
+
+@keyframes device-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+    filter: blur(6px);
+  }
+}
+
+@keyframes rec-blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.rec-blink {
+  animation: rec-blink 1.2s steps(1) infinite;
+}
+
+/* Director's commentary: server-rendered notes, revealed by a client toggle. */
+.commentary {
+  display: none;
+}
+
+html[data-commentary="on"] .commentary {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .push-in,
+  .rec-blink {
+    animation: none;
+  }
 }
