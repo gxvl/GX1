@@ -73,14 +73,22 @@ function listenTilt(aim: Aim, onFirst: () => void) {
  * that angle (zooming just enough to hide its corners), so its horizon stays
  * level with the real one. The HUD level line shows the true horizon.
  *
+ * Safari only lets a muted video autoplay while most of the element is on
+ * screen, and the counter-rotation zooms it to ~2.3x. So in gyroscope mode
+ * the <video> itself stays untransformed at screen size and a <canvas> on top
+ * draws each frame rotated and zoomed.
+ *
  * One rAF loop writes transforms straight to the DOM (no re-renders), runs
  * only while on screen, and stays still under reduced motion.
  */
 export function StabilizerDemo({
   children,
   overlay,
+  videoId,
 }: {
   children: ReactNode;
+  /** The footage <video> inside `children`, drawn to canvas in gyroscope mode. */
+  videoId?: string;
   overlay?: ReactNode;
 }) {
   const [on, setOn] = useState(false);
@@ -93,6 +101,7 @@ export function StabilizerDemo({
   const outLine = useRef<SVGPolylineElement>(null);
   const readout = useRef<HTMLSpanElement>(null);
   const levelLine = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
   const aim = useRef<Aim>({ x: 0, y: 0, lastInput: -Infinity, tilt: false, roll: 0 });
   const stopTilt = useRef<(() => void) | null>(null);
 
@@ -225,19 +234,49 @@ export function StabilizerDemo({
       // What the recorded horizon does relative to the real one.
       const horizon = tilt ? phoneRoll + roll + comp : roll;
 
-      if (frame.current) {
-        const tx = ox * 3.2; // vw
-        const ty = oy * 2.4; // vh
-        const ry = ox * 5;
-        const rx = -oy * 3.5;
-        // Rotating a W×H frame by a needs cos(a) + max(W/H, H/W)·sin(a) to cover it.
-        const a = (Math.abs(roll + comp) * Math.PI) / 180;
-        const ratio = Math.max(box.w / box.h, box.h / box.w) || 1;
-        const cover = tilt ? Math.cos(a) + ratio * Math.sin(a) : 1;
-        const scale = (1.14 + 0.08 * offAmount) * Math.max(1, cover);
-        frame.current.style.transform = fine
-          ? `translate3d(${tx}vw, ${ty}vh, 0) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${roll + comp}deg) scale(${scale})`
-          : `translate(${tx}vw, ${ty}vh) rotate(${roll + comp}deg) scale(${scale})`;
+      const tx = ox * 3.2; // vw
+      const ty = oy * 2.4; // vh
+      // Rotating a W×H frame by a needs cos(a) + max(W/H, H/W)·sin(a) to cover it.
+      const a = (Math.abs(roll + comp) * Math.PI) / 180;
+      const ratio = Math.max(box.w / box.h, box.h / box.w) || 1;
+      const cover = tilt ? Math.cos(a) + ratio * Math.sin(a) : 1;
+      const scale = (1.14 + 0.08 * offAmount) * Math.max(1, cover);
+      const video = tilt && videoId ? (document.getElementById(videoId) as HTMLVideoElement | null) : null;
+
+      if (video && canvas.current && video.readyState >= 2 && video.videoWidth) {
+        // Gyroscope mode: the <video> stays at screen size (so Safari keeps it
+        // playing) and the canvas draws it rotated and zoomed.
+        const c = canvas.current;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const W = box.w;
+        const H = box.h;
+        if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) {
+          c.width = Math.round(W * dpr);
+          c.height = Math.round(H * dpr);
+        }
+        const ctx = c.getContext("2d");
+        if (ctx) {
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.translate(W / 2 + (tx * window.innerWidth) / 100, H / 2 + (ty * window.innerHeight) / 100);
+          ctx.rotate(((roll + comp) * Math.PI) / 180);
+          ctx.scale(scale, scale);
+          // object-fit: cover, centred
+          const k = Math.max(W / video.videoWidth, H / video.videoHeight);
+          const dw = video.videoWidth * k;
+          const dh = video.videoHeight * k;
+          ctx.drawImage(video, -dw / 2, -dh / 2, dw, dh);
+        }
+        c.style.opacity = "1";
+        if (frame.current) frame.current.style.transform = "none";
+      } else {
+        if (canvas.current) canvas.current.style.opacity = "0";
+        if (frame.current) {
+          const ry = ox * 5;
+          const rx = -oy * 3.5;
+          frame.current.style.transform = fine
+            ? `translate3d(${tx}vw, ${ty}vh, 0) rotateY(${ry}deg) rotateX(${rx}deg) rotate(${roll + comp}deg) scale(${scale})`
+            : `translate(${tx}vw, ${ty}vh) rotate(${roll + comp}deg) scale(${scale})`;
+        }
       }
       if (levelLine.current) {
         // On phones the level line is a real level: it marks the true horizon.
@@ -285,7 +324,7 @@ export function StabilizerDemo({
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerleave", onLeave);
     };
-  }, []);
+  }, [videoId]);
 
   return (
     <div ref={root} className="absolute inset-0 touch-pan-y overflow-hidden">
@@ -296,6 +335,11 @@ export function StabilizerDemo({
       >
         {children}
       </div>
+      <canvas
+        ref={canvas}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
+      />
 
       {overlay}
 

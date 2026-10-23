@@ -164,6 +164,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
           scrim="none"
           media={
             <StabilizerDemo
+              videoId="pov-footage"
               overlay={
                 <div
                   aria-hidden="true"
